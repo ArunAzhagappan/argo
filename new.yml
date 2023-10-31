@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-new
+  namespace: argocd
+spec:
+  selector:
+    matchLabels:
+      run: nginx-new
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: nginx-new
+    spec:
+      containers:
+      - name: nginx-new
+        image: balanced:1.0
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-new
+  labels:
+    run: nginx-new
+spec:
+  ports:
+  - port: 80
+  selector:
+    run: nginx-new
+  type: LoadBalancer
+
