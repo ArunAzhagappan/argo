@@ -1,39 +1,41 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
-  name: nginx-new
+ name: webapp2
+ namespace: myapp
+ labels:
+   app: web
+   env: dev
 spec:
-  selector:
-    matchLabels:
-      run: nginx-new
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        run: nginx-new
-    spec:
-      containers:
-      - name: nginx-new
-        image: arunazhagappan/balanced:1.0
-        ports:
-        - containerPort: 80
-        resources:
+  containers:
+  - name: webcon
+    image: arunazhagappan/balanced:1.0
+    #image: sudarshanlnx/farmfresh:v1
+    imagePullPolicy: Always
+    ports:
+    - containerPort: 80
+      name: apache
+      protocol: TCP
+    resources:
           requests:
-            cpu: 100m
-            memory: 100Mi
-
+            memory: "200Mi"
+            cpu: "200m"
+          limits:
+            memory: "300Mi"
+            cpu: "400m"
 ---
-
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-new
-  labels:
-    run: nginx-new
+ name: websvc2
+ namespace: myapp
 spec:
-  ports:
-  - port: 80
-  selector:
-    run: nginx-new
-  type: LoadBalancer
-
+ type: LoadBalancer
+ ports:
+ - name: apache
+   port: 80
+   targetPort: 80
+   protocol: TCP
+ selector:
+   app: web
+   env: dev
