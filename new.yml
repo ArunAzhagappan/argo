@@ -16,7 +16,7 @@ spec:
       - name: nginx-new
         image: balanced:1.0
         ports:
-        - containerPort: 1000
+        - containerPort: 80
         resources:
           requests:
             cpu: 100m
@@ -32,7 +32,7 @@ metadata:
     run: nginx-new
 spec:
   ports:
-  - port: 1000
+  - port: 80
   selector:
     run: nginx-new
   type: LoadBalancer
