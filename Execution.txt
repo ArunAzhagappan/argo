@@ -1,0 +1,18 @@
+# install ArgoCD in k8s
+kubectl create namespace argocd
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+
+# access ArgoCD UI
+kubectl get svc -n argocd
+kubectl port-forward svc/argocd-server 8080:443 -n argocd
+
+# login with admin user and below token (as in documentation):
+kubectl.exe -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | ForEach-Object { [System.Text.Encoding]::ASCII.GetString([System.Convert]::FromBase64String($_)) }
+
+# Using UI - Argocd app inputs for creating a application, once its healthy and synced then forward the particular app to another port
+and connect a yml file git repository link to argocd
+
+kubectl port-forward svc/(app name) 9090:80
+
+***The appllication or docker output will be displayed
+                                             
