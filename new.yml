@@ -1,41 +1,39 @@
-apiVersion: v1
-kind: Pod
+apiVersion: apps/v1
+kind: Deployment
 metadata:
- name: webapp2
- namespace: myapp
- labels:
-   app: web
-   env: dev
+  name: newdoc
 spec:
-  containers:
-  - name: webcon
-    image: arunazhagappan/balanced:1.0
-    #image: sudarshanlnx/farmfresh:v1
-    imagePullPolicy: Always
-    ports:
-    - containerPort: 80
-      name: apache
-      protocol: TCP
-    resources:
+  selector:
+    matchLabels:
+      run: newdoc
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: newdoc
+    spec:
+      containers:
+      - name: newdoc
+        image: arunazhagappan/balanced:1.0
+        ports:
+        - containerPort: 80
+        resources:
           requests:
-            memory: "200Mi"
-            cpu: "200m"
-          limits:
-            memory: "300Mi"
-            cpu: "400m"
+            cpu: 100m
+            memory: 100Mi
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
- name: websvc2
- namespace: myapp
+  name: newdoc
+  labels:
+    run: newdoc
 spec:
- type: LoadBalancer
- ports:
- - name: apache
-   port: 80
-   targetPort: 80
-   protocol: TCP
- selector:
-   app: web
-   env: dev
+  ports:
+  - port: 80
+  selector:
+    run: newdoc
+  type: LoadBalancer
+
