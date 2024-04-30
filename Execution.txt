@@ -12,6 +12,7 @@ kubectl.exe -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data
 # Using UI - Argocd app inputs for creating a application, once its healthy and synced then forward the particular app to another port
 and connect a yml file git repository link to argocd
 
+kubectl get pods (for choosing the app name)
 kubectl port-forward svc/(app name) 9090:80
 
 ***The appllication or docker output will be displayed

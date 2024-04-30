@@ -16,7 +16,7 @@ spec:
       - name: newdoc
         image: arunazhagappan/balanced:1.0
         ports:
-        - containerPort: 80
+        - containerPort: 8080
         resources:
           requests:
             cpu: 100m
@@ -32,7 +32,7 @@ metadata:
     run: newdoc
 spec:
   ports:
-  - port: 80
+  - port: 8080
   selector:
     run: newdoc
   type: LoadBalancer
