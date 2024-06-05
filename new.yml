@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: newdoc
-        image: arunazhagappan/balanced:1.0
+        image: arunazhagappan/updated:1.0
         ports:
         - containerPort: 80
         resources:
