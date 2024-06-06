@@ -39,12 +39,12 @@ jobs:
 
       - name: Update deployment.yaml
         run: |
-          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
       - name: Commit and push changes
-        if: success() && env.DOCKER_IMAGE != ''
+        if: success()
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -55,7 +55,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
-        if: success() && env.DOCKER_IMAGE != ''
+        if: success()
         run: |
           curl -k -X POST https://argocd-server/api/v1/applications/my-app/sync \
           -H "Authorization: Bearer $ARGOCD_TOKEN"
