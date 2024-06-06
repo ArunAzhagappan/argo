@@ -15,6 +15,7 @@ spec:
       containers:
       - name: newdoc
         image: arunazhagappan/newimage:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         resources:
