@@ -25,6 +25,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
+        id: build-image
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -33,9 +34,12 @@ jobs:
           no-cache: true  # Disable cache to ensure the image is rebuilt
           tags: arunazhagappan/newimage:latest
 
+      - name: Verify image was pushed
+        run: echo "Image pushed with tag: ${{ steps.build-image.outputs.digest }}"
+
       - name: Update deployment.yaml
         run: |
-          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
