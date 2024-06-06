@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - 'index.html'  # Trigger on changes to the index.html file
+      - index.html  # Trigger on changes to the index.html file
 
 jobs:
   build:
