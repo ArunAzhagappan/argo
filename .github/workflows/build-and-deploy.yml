@@ -32,7 +32,7 @@ jobs:
 
       - name: Update Kubernetes manifests
         run: |
-          sed -i 's|image: ***/.*|image: ***/newimage:latest|g' deployment.yml
+          sed -i 's|image: \*\*\*/.*|image: \*\*\*/newimage:latest|g' deployment.yml
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
