@@ -1,9 +1,12 @@
-FROM nginx
- 
-RUN apt-get update && apt-get upgrade -y
- 
-COPY index.html /usr/share/nginx/html
- 
-EXPOSE 80
- 
-CMD ["nginx", "-g", "daemon off;"]
+<html>
+  <head>
+    <title>Docker nginx Tutorial</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Hello There, Its first super docker!!</h1>
+      <p>Welcome to Teika, Happy super super Coding!!</p>
+    </div>
+  </body>
+</html>
