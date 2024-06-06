@@ -39,7 +39,7 @@ jobs:
 
       - name: Update deployment.yaml
         run: |
-          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || true
 
       - name: Commit and push changes
         if: success()
