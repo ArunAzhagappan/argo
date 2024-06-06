@@ -34,9 +34,6 @@ jobs:
           no-cache: true  # Disable cache to ensure the image is rebuilt
           tags: arunazhagappan/newimage:latest
 
-      - name: Verify image was pushed
-        run: echo "Image pushed with tag: ${{ steps.build-image.outputs.digest }}"
-
       - name: Update deployment.yaml
         run: |
           sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || true
