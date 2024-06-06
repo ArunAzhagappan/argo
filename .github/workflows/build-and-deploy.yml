@@ -36,7 +36,7 @@ jobs:
 
       - name: Update deployment.yaml
         run: |
-          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || true
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
 
       - name: Commit and push changes
         if: success()
@@ -44,7 +44,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add deployment.yaml
-          git commit -m "Update image to arunazhagappan/newimage:latest"
+          git diff --cached --quiet || git commit -m "Update image to arunazhagappan/newimage:latest"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
