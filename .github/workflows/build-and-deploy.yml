@@ -30,23 +30,24 @@ jobs:
           push: true
           tags: arunazhagappan/newimage:latest
 
-      - name: Update Kubernetes manifests
+      - name: Update deployment.yaml
         run: |
-          sed -i 's|image: \*\*\*/.*|image: \*\*\*/newimage:latest|g' deployment.yml
+          sed -i 's|image: \*\*\*/.*|image: \*\*\*/newimage:latest|g' deployment.yml || echo "No deployment.yaml found or no need to update"
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
       - name: Commit and push changes
+        if: success() && env.DOCKER_IMAGE != ''  # Only commit changes if Docker image was updated
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add k8s/deployment.yaml
-          git commit -m "Update image to $DOCKER_IMAGE"
+          git commit -am "Update image to $DOCKER_IMAGE"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
+        if: success() && env.DOCKER_IMAGE != ''  # Only trigger sync if Docker image was updated
         run: |
           curl -k -X POST https://argocd-server/api/v1/applications/my-app/sync \
           -H "Authorization: Bearer $ARGOCD_TOKEN"
