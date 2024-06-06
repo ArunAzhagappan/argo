@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - index.html  # Trigger on changes to the index.html file
+      - 'index.html'  # Trigger on changes to the index.html file
 
 jobs:
   build:
@@ -44,7 +44,8 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git commit -am "Update image to $DOCKER_IMAGE"
+          git add deployment.yaml
+          git commit -m "Update image to $DOCKER_IMAGE"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,7 +53,4 @@ jobs:
       - name: Trigger ArgoCD sync
         if: success() && env.DOCKER_IMAGE != ''
         run: |
-          curl -k -X POST https://argocd-server/api/v1/applications/my-app/sync \
-          -H "Authorization: Bearer $ARGOCD_TOKEN"
-        env:
-          ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+          curl -k -X POST https://arg
