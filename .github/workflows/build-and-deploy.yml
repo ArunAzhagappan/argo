@@ -4,6 +4,13 @@ on:
   push:
     branches:
       - main
+  # Trigger the workflow on any changes to files in the repository
+  # This includes changes to the index.html file
+  # You can further specify paths if needed
+  # For example:
+  #   paths:
+  #     - 'index.html'
+  #     - 'path/to/other/file'
 
 jobs:
   build:
@@ -29,9 +36,6 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: arunazhagappan/newimage:latest
-          build-args: |
-            CACHEBUST=$(date +%s)
-            CACHEBUST=$CACHEBUST
 
       - name: Update deployment.yaml
         run: |
