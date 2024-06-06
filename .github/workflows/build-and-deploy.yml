@@ -4,13 +4,9 @@ on:
   push:
     branches:
       - main
-  # Trigger the workflow on any changes to files in the repository
-  # This includes changes to the index.html file
-  # You can further specify paths if needed
-  # For example:
-  #   paths:
-  #     - 'index.html'
-  #     - 'path/to/other/file'
+  # Trigger the workflow on any changes to the index.html file
+  paths:
+    - 'index.html'
 
 jobs:
   build:
@@ -35,11 +31,12 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          no-cache: true  # Disable cache to ensure the image is rebuilt
           tags: arunazhagappan/newimage:latest
 
       - name: Update deployment.yaml
         run: |
-          sed -i 's|image: \*\*\*/.*|image: \*\*\*/newimage:latest|g' deployment.yml || echo "No deployment.yaml found or no need to update"
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
