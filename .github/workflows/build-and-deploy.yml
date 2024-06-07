@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'index.html'  # Trigger on changes to the index.html file
+      - 'deployment.yaml' # Trigger on changes to the deployment.yaml file
 
 jobs:
   build:
@@ -25,6 +26,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
+        id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -36,33 +38,33 @@ jobs:
       - name: Update deployment.yaml
         run: |
           sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
+        if: steps.docker_build.outputs.pushed
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
-      - name: Debug Git Config
-        run: git config --list
+      - name: Debug deployment.yaml
+        run: cat deployment.yaml
 
-      - name: Debug Git Status
-        run: git status
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && success() && steps.docker_build.outputs.pushed }}
 
-      - name: Debug Git Log
-        run: git log --oneline -n 5
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Commit and push changes
-        if: success() && env.DOCKER_IMAGE != ''
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add deployment.yaml
-          git commit -m "Update image to $DOCKER_IMAGE"
+          git commit -m "Update image tag in deployment.yaml"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
-        if: success() && env.DOCKER_IMAGE != ''
         run: |
           curl -k -X POST https://argocd-server/api/v1/applications/my-app/sync \
-          -H "Authorization: Bearer $ARGOCD_TOKEN"
-        env:
-          ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
+          -H "Authorization: Bearer ${{ secrets.ARGOCD_TOKEN }}"
