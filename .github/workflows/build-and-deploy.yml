@@ -34,12 +34,9 @@ jobs:
           tags: arunazhagappan/newimage:latest
 
       - name: Update deployment.yaml
-        run: |
-          echo "Before sed:"
-          cat deployment.yaml
-          sed -i "s|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g" deployment.yaml
-          echo "After sed:"
-          cat deployment.yaml
+        run:  |
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
+          
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
