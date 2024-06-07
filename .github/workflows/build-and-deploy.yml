@@ -36,10 +36,17 @@ jobs:
       - name: Update deployment.yaml
         run: |
           sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
-      - name: Debug deployment.yaml
-        run: cat deployment.yaml
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
+
+      - name: Debug Git Config
+        run: git config --list
+
+      - name: Debug Git Status
+        run: git status
+
+      - name: Debug Git Log
+        run: git log --oneline -n 5
 
       - name: Commit and push changes
         if: success() && env.DOCKER_IMAGE != ''
