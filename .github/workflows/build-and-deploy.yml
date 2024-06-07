@@ -32,15 +32,12 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          no-cache: true  # Disable cache to ensure the image is rebuilt
           tags: arunazhagappan/newimage:latest
 
       - name: Update deployment.yaml
+        if: success() && always()
         run: |
-          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
-        if: success() && needs.build.outputs.docker_build == 'true'
-        env:
-          DOCKER_IMAGE: arunazhagappan/newimage:latest
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml
 
       - name: Debug deployment.yaml
         run: cat deployment.yaml
@@ -48,7 +45,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && success() && needs.build.outputs.docker_build == 'true' }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
 
     steps:
       - name: Checkout code
