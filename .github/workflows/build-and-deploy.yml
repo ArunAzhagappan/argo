@@ -6,7 +6,6 @@ on:
       - main
     paths:
       - 'index.html'  # Trigger on changes to the index.html file
-      - 'deployment.yaml' # Trigger on changes to the deployment.yaml file
 
 jobs:
   build:
@@ -26,42 +25,42 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Docker image
-        id: docker_build
         uses: docker/build-push-action@v2
         with:
           context: .
           file: ./Dockerfile
           push: true
+          no-cache: true  # Disable cache to ensure the image is rebuilt
           tags: arunazhagappan/newimage:latest
 
       - name: Update deployment.yaml
-        if: success() && always()
         run: |
-          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
+        env:
+          DOCKER_IMAGE: arunazhagappan/newimage:latest
 
-      - name: Debug deployment.yaml
-        run: cat deployment.yaml
+      - name: Debug Git Status
+        run: git status
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Debug Git Log
+        run: git log --oneline -n 5
 
       - name: Commit and push changes
+        if: success() && env.DOCKER_IMAGE != ''
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add deployment.yaml
-          git commit -m "Update image tag in deployment.yaml"
+          git status
+          git commit -m "Update image to $DOCKER_IMAGE"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
+        if: success() && env.DOCKER_IMAGE != ''
         run: |
           curl -k -X POST https://argocd-server/api/v1/applications/my-app/sync \
-          -H "Authorization: Bearer ${{ secrets.ARGOCD_TOKEN }}"
+          -H "Authorization: Bearer $ARGOCD_TOKEN"
+        env:
+          ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
