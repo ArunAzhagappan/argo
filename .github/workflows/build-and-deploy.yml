@@ -36,6 +36,8 @@ jobs:
       - name: Update deployment.yaml
         run: |
           sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
+      - name: Debug deployment.yaml
+        run: cat deployment.yaml
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
