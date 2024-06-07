@@ -39,6 +39,14 @@ jobs:
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
+      - name: Test sed command
+        run: |
+          echo "Before sed:"
+          cat deployment.yaml
+          sed -i "s|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g" deployment.yaml
+          echo "After sed:"
+          cat deployment.yaml
+
       - name: Debug Git Status
         run: git status
 
