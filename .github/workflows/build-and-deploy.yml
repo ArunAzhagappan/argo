@@ -38,7 +38,7 @@ jobs:
       - name: Update deployment.yaml
         run: |
           sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
-        if: steps.docker_build.outputs.pushed
+        if: success() && needs.build.outputs.docker_build == 'true'
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
@@ -48,7 +48,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && success() && steps.docker_build.outputs.pushed }}
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && success() && needs.build.outputs.docker_build == 'true' }}
 
     steps:
       - name: Checkout code
