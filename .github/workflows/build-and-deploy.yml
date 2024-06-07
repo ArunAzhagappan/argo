@@ -35,11 +35,7 @@ jobs:
 
       - name: Update deployment.yaml
         run: |
-          echo "Before sed:"
-          cat deployment.yaml
-          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || { echo "Error: sed command failed"; exit 1; }
-          echo "After sed:"
-          cat deployment.yaml
+          sed -i "s|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g" deployment.yaml || { echo "Error: sed command failed"; exit 1; }
         env:
           DOCKER_IMAGE: arunazhagappan/newimage:latest
 
