@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout code
@@ -61,7 +61,7 @@ jobs:
       - name: Trigger ArgoCD sync
         run: |
           echo "Triggering ArgoCD sync..."
-          curl -k -X POST https://argocd-server/api/v1/applications/my-app/sync \
+          curl -k -X POST http://localhost:8000/api/v1/applications/my-app/sync \
           -H "Authorization: Bearer $ARGOCD_TOKEN" || { echo "Failed to trigger ArgoCD sync"; exit 1; }
         env:
           ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
