@@ -45,7 +45,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git add deployment.yaml
           git diff --cached --quiet || git commit -m "Update image to arunazhagappan/newimage:latest"
-          git push
+          git -c http.extraheader="Authorization: Bearer ${{ secrets.GH_PAT }}" push https://github.com/ArunAzhagappan/argo.git HEAD:main
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
 
