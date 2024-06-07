@@ -35,38 +35,30 @@ jobs:
 
       - name: Update deployment.yaml
         run: |
-          sed -i "s|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g" deployment.yaml || { echo "Error: sed command failed"; exit 1; }
-        env:
-          DOCKER_IMAGE: arunazhagappan/newimage:latest
-
-      - name: Test sed command
-        run: |
           echo "Before sed:"
           cat deployment.yaml
           sed -i "s|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g" deployment.yaml
           echo "After sed:"
           cat deployment.yaml
-
-      - name: Debug Git Status
-        run: git status
-
-      - name: Debug Git Log
-        run: git log --oneline -n 5
+        env:
+          DOCKER_IMAGE: arunazhagappan/newimage:latest
 
       - name: Commit and push changes
-        if: success() && env.DOCKER_IMAGE != ''
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add deployment.yaml
           git status
-          git commit -m "Update image to $DOCKER_IMAGE"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update image to arunazhagappan/newimage:latest"
+            git push
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
-        if: success() && env.DOCKER_IMAGE != ''
         run: |
           curl -k -X POST https://argocd-server/api/v1/applications/my-app/sync \
           -H "Authorization: Bearer $ARGOCD_TOKEN"
