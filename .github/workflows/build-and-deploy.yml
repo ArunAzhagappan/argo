@@ -6,9 +6,10 @@ on:
       - main
     paths:
       - 'index.html'  # Trigger on changes to the index.html file
+      - 'deployment.yaml'  # Trigger on changes to the deployment.yaml file
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,12 +31,30 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          no-cache: true  # Disable cache to ensure the image is rebuilt
           tags: arunazhagappan/newimage:latest
+
+      - name: Update deployment.yaml and push changes
+        run: |
+          docker run --rm -v $(pwd):/workspace alpine sed -i 's|image: .*/newimage:.*|image: '${DOCKER_IMAGE}'|g' /workspace/deployment.yaml
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add deployment.yaml
+          git status
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update image to ${DOCKER_IMAGE}"
+            git push
+          fi
+        env:
+          DOCKER_IMAGE: arunazhagappan/newimage:latest
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
         run: |
           echo "Triggering ArgoCD sync..."
           curl -k -X POST https://0d66-117-242-217-241.ngrok-free.app/api/v1/applications/my-app/sync \
-          -H "Authorization: Bearer $ARGOCD_TOKEN"
+          -H "Authorization: Bearer $ARGOCD_TOKEN" || { echo "Failed to trigger ArgoCD sync"; exit 1; }
         env:
           ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
