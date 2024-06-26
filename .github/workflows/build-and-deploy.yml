@@ -30,38 +30,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          no-cache: true  # Disable cache to ensure the image is rebuilt
           tags: arunazhagappan/newimage:latest
-
-      - name: Print deployment.yaml before update
-        run: |
-          echo "Contents of deployment.yaml before update:"
-          cat deployment.yaml || echo "No deployment.yaml found"
-
-      - name: Update deployment.yaml
-        run: |
-          echo "Updating deployment.yaml..."
-          sed -i 's|image: arunazhagappan/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml
-          echo "Contents of deployment.yaml after update:"
-          cat deployment.yaml || echo "No deployment.yaml found or no changes made"
-        env:
-          DOCKER_IMAGE: arunazhagappan/newimage:latest
-
-      - name: Commit and push changes
-        run: |
-          echo "Committing changes..."
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add deployment.yaml
-          git status
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update image to arunazhagappan/newimage:latest"
-            git push
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
         run: |
