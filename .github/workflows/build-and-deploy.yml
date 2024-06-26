@@ -1,4 +1,3 @@
-
 name: Build and Deploy
 
 on:
@@ -32,6 +31,25 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: arunazhagappan/newimage:latest
+
+      - name: Update deployment.yaml
+        run: |
+          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml || echo "No deployment.yaml found or no need to update"
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add deployment.yaml
+          git status
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update image to arunazhagappan/newimage:latest"
+            git push
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
         run: |
