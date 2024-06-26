@@ -36,6 +36,6 @@ jobs:
         run: |
           echo "Triggering ArgoCD sync..."
           curl -k -X POST https://0d66-117-242-217-241.ngrok-free.app/api/v1/applications/my-app/sync \
-          -H "Authorization: Bearer ${{ secrets.ARGOCD_TOKEN }}" || { echo "Failed to trigger ArgoCD sync"; exit 1; }
+          -H "Authorization: Bearer $ARGOCD_TOKEN"
         env:
           ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
