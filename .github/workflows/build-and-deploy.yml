@@ -1,3 +1,4 @@
+
 name: Build and Deploy
 
 on:
@@ -31,32 +32,6 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: arunazhagappan/newimage:latest
-
-      - name: Install jq and yq
-        run: |
-          sudo apt-get update
-          sudo apt-get install jq
-          sudo wget https://github.com/mikefarah/yq/releases/download/v4.16.2/yq_linux_amd64 -O /usr/bin/yq && sudo chmod +x /usr/bin/yq
-
-      - name: Update deployment.yaml
-        run: |
-          NEW_IMAGE="arunazhagappan/newimage:latest"
-          yq e ".spec.template.spec.containers[].image = \"$NEW_IMAGE\"" -i deployment.yaml
-
-      - name: Commit and push changes
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add deployment.yaml
-          git status
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Update image to arunazhagappan/newimage:latest"
-            git push
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Trigger ArgoCD sync
         run: |
