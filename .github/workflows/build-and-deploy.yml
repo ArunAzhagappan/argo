@@ -41,7 +41,7 @@ jobs:
       - name: Update deployment.yaml
         run: |
           echo "Updating deployment.yaml..."
-          sed -i 's|image: .*/newimage:.*|image: arunazhagappan/newimage:latest|g' deployment.yaml
+          sed -i 's|image: [^ ]*/newimage:[^ ]*|image: arunazhagappan/newimage:latest|g' deployment.yaml
           echo "Contents of deployment.yaml after update:"
           cat deployment.yaml || echo "No deployment.yaml found or no changes made"
         env:
