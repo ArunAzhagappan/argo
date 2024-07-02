@@ -38,19 +38,11 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: arunazhagappan/newimage:latest  # Assuming your Docker image name is arunazhagappan/newimage:latest
-
-      - name: Check NGINX container status
-        run: |
-          if docker ps -a --filter "name=newimage" --format '{{.ID}}'; then
-            echo "NGINX container is already running."
-          else
-            echo "Starting NGINX container..."
-            docker run --name newimage -d -p 8080:80 arunazhagappan/newimage:latest
-          fi
+          tags: arunazhagappan/nginx-image:latest
 
       - name: Run NGINX container for tests
         run: |
+          docker run --name nginx-test-container -d -p 8080:80 arunazhagappan/nginx-image:latest
           sleep 10  # Adjust sleep time based on NGINX startup time
           response=$(curl -s -I http://localhost:8080/index.html)
           echo "NGINX Test Response:"
@@ -58,16 +50,9 @@ jobs:
           echo ""
           echo "NGINX Test Content:"
           curl -s http://localhost:8080/index.html
-          docker logs newimage  # Output logs for debugging
-
-      - name: Restart NGINX container if needed
-        run: |
-          if docker ps -a --filter "name=newimage" --format '{{.ID}}'; then
-            docker restart newimage
-            echo "NGINX container restarted."
-          else
-            echo "NGINX container does not exist or is not running. Skipping restart."
-          fi
+          docker logs nginx-test-container  # Output logs for debugging
+          docker stop nginx-test-container
+          docker rm nginx-test-container
 
       - name: Trigger ArgoCD sync
         run: |
