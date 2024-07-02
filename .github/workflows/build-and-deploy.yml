@@ -40,9 +40,13 @@ jobs:
           push: true
           tags: arunazhagappan/nginx-image:latest
 
+      - name: Restart NGINX container
+        run: |
+          docker restart nginx-test-container
+          echo "NGINX container restarted."
+
       - name: Run NGINX container for tests
         run: |
-          docker run --name nginx-test-container -d -p 8080:80 arunazhagappan/nginx-image:latest
           sleep 10  # Adjust sleep time based on NGINX startup time
           response=$(curl -s -I http://localhost:8080/index.html)
           echo "NGINX Test Response:"
