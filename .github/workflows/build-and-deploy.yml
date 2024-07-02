@@ -1,5 +1,4 @@
-
-name: Build and Deploy
+name: Build, Test, and Deploy
 
 on:
   push:
@@ -31,7 +30,15 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: arunazhagappan/newimage:latest
+          tags: arunazhagappan/nginx-image:latest
+
+      - name: Run NGINX container for tests
+        run: |
+          docker run --name nginx-test-container -d -p 8080:80 arunazhagappan/nginx-image:latest
+          sleep 10 # Give NGINX some time to start
+          curl -I http://localhost:8080/index.html || { echo "NGINX test failed"; docker logs nginx-test-container; exit 1; }
+          docker stop nginx-test-container
+          docker rm nginx-test-container
 
       - name: Trigger ArgoCD sync
         run: |
