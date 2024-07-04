@@ -34,7 +34,7 @@ jobs:
 
       - name: Substitute environment variables in deployment.yaml
         run: |
-          envsubst < template-deployment.yaml > deployment.yaml
+          envsubst < deployment.yaml > deployment.yaml
 
       - name: Apply Kubernetes deployment
         run: |
