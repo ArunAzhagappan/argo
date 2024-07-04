@@ -48,22 +48,17 @@ jobs:
 
       - name: Replace image tag in Kubernetes deployment
         run: |
-          IMAGE_TAG=${{ github.sha }}
-          sed -i 's|${IMAGE_TAG}|'$IMAGE_TAG'|g' deployment.yaml
+          sed -i 's|${IMAGE_TAG}|'${{ github.sha }}'|g' deployment.yaml
 
       - name: Apply Kubernetes deployment
-        uses: azure/k8s-deploy@v1
-        with:
-          manifests: |
-            ./deployment.yaml
+        run: |
+          kubectl apply -f deployment.yaml
 
       - name: Trigger ArgoCD sync
         run: |
           echo "Triggering ArgoCD sync..."
           curl -k -X POST https://e952-117-242-217-241.ngrok-free.app/api/v1/applications/my-app/sync \
           -H "Authorization: Bearer ${{ secrets.ARGOCD_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          -d '{"spec": {"source": {"path": "path/to/deployment", "helm": {"parameters": [{"name": "image.tag", "value": "'${{ github.sha }}'"}]}}}}' \
           || { echo "Failed to trigger ArgoCD sync"; exit 1; }
         env:
           ARGOCD_TOKEN: ${{ secrets.ARGOCD_TOKEN }}
