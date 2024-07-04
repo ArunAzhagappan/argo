@@ -15,14 +15,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      # Install ngrok directly (if needed)
-      # - name: Download ngrok
-      #   run: |
-      #     curl -o ngrok.zip https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
-      #     unzip ngrok.zip
-      #     chmod +x ngrok
-      #     sudo mv ngrok /usr/local/bin/ngrok
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
@@ -38,11 +30,11 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: arunazhagappan/nginx-image:latest
+          tags: arunazhagappan/nginx-image:${{ github.sha }}
 
       - name: Run NGINX container for tests
         run: |
-          docker run --name nginx-test-container -d -p 8080:80 arunazhagappan/nginx-image:latest
+          docker run --name nginx-test-container -d -p 8080:80 arunazhagappan/nginx-image:${{ github.sha }}
           sleep 10  # Adjust sleep time based on NGINX startup time
           response=$(curl -s -I http://localhost:8080/index.html)
           echo "NGINX Test Response:"
