@@ -32,27 +32,13 @@ jobs:
           push: true
           tags: arunazhagappan/nginx-image:${{ github.sha }}
 
-      - name: Run NGINX container for tests
+      - name: Substitute environment variables in deployment.yaml
         run: |
-          docker run --name nginx-test-container -d -p 8080:80 arunazhagappan/nginx-image:${{ github.sha }}
-          sleep 10  # Adjust sleep time based on NGINX startup time
-          response=$(curl -s -I http://localhost:8080/index.html)
-          echo "NGINX Test Response:"
-          echo "$response"
-          echo ""
-          echo "NGINX Test Content:"
-          curl -s http://localhost:8080/index.html
-          docker logs nginx-test-container  # Output logs for debugging
-          docker stop nginx-test-container
-          docker rm nginx-test-container
-
-      - name: Replace image tag in Kubernetes deployment
-        run: |
-          sed -i 's|${IMAGE_TAG}|'${{ github.sha }}'|g' deployment.yaml
+          envsubst < template-deployment.yaml > deployment.yaml
 
       - name: Apply Kubernetes deployment
         run: |
-          kubectl apply -f deployment.yaml --validate=false
+          kubectl apply -f deployment.yaml
 
       - name: Trigger ArgoCD sync
         run: |
