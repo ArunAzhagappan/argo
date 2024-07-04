@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: newdoc
-          image: arunazhagappan/nginx-image:${IMAGE_TAG}
+          image: arunazhagappan/nginx-image:${{ github.sha }}
           imagePullPolicy: Always
           ports:
             - containerPort: 80
