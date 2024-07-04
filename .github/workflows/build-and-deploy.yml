@@ -41,6 +41,10 @@ jobs:
             exit 1
           fi
 
+      - name: List files in manifests directory
+        run: |
+          ls -l ./manifests
+
       - name: Update deployment manifest
         run: |
           sed -i "s|arunazhagappan/nginx-image:.*|arunazhagappan/nginx-image:${{ github.sha }}|g" ./manifests/deployment.yaml
