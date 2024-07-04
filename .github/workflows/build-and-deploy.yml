@@ -46,6 +46,17 @@ jobs:
           docker stop nginx-test-container
           docker rm nginx-test-container
 
+      - name: Replace image tag in Kubernetes deployment
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          sed -i 's|${IMAGE_TAG}|'$IMAGE_TAG'|g' deployment.yaml
+
+      - name: Apply Kubernetes deployment
+        uses: azure/k8s-deploy@v1
+        with:
+          manifests: |
+            ./deployment.yaml
+
       - name: Trigger ArgoCD sync
         run: |
           echo "Triggering ArgoCD sync..."
