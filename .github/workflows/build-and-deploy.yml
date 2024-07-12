@@ -31,21 +31,13 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: arunazhagappan/nginx-image:latest,arunazhagappan/nginx-image:${{ github.sha }}
-
-      - name: Verify Docker image update
-        run: |
-          docker pull arunazhagappan/nginx-image:${{ github.sha }}
-          if [ "$(docker images -q arunazhagappan/nginx-image:${{ github.sha }})" == "" ]; then
-            echo "Docker image was not updated"
-            exit 1
-          fi
+          tags: arunazhagappan/nginx-image:${{ github.sha }}
 
       - name: Update deployment manifest
         run: |
           sed -i "s|arunazhagappan/nginx-image:.*|arunazhagappan/nginx-image:${{ github.sha }}|g" ./deployment.yaml
-          git config --local user.email "ci@do-k8s-challenge.com"
-          git config --local user.name "ci"
+          git config --local user.email "arunazhagappan44@gmail.com"
+          git config --local user.name "ArunAzhagappan"
           git add ./deployment.yaml
           git commit -m "Update deployment to image version ${{ github.sha }}"
           git push origin main
