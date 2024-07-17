@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: newdoc
-          image: arunazhagappan/nginx-image:b4a597db27ee9fdd6ab5696f7c6a15c55ae31cc2
+          image: arunazhagappan/nginx-image:92ec998b5f6158ef4f801d2c994c81e658e3764f
           imagePullPolicy: Always
           ports:
             - containerPort: 80
